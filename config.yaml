@@ -1,0 +1,40 @@
+site:
+  name: "IvoireMatin"
+  url: "https://www.ivoirematin.com"
+  rss_title: "Flux RSS - IvoireMatin"
+  rss_description: "Articles scrappés depuis IvoireMatin"
+
+xpath:
+  # Sélecteur pour les conteneurs d'articles (3 structures possibles)
+  post_container: |
+    //div[contains(@class,'post-main') and contains(@class,'post-large') and .//span[contains(text(),'Lectures')]] | 
+    //li[contains(@class,'post-content-vertical') and contains(@class,'post-large') and .//span[contains(text(),'Lectures')]] | 
+    //div[contains(@class,'post-sidebar-big') and contains(@class,'post-global') and .//span[contains(text(),'Lectures')]]
+  
+  # Titre de l'article (normalisé)
+  title: "normalize-space(.//a[contains(@class,'content-link')])"
+  
+  # URL de l'article
+  url: ".//a[contains(@class,'content-link')]/@href"
+  
+  # Description / résumé
+  description: ".//p[contains(@class,'post-large__text')]"
+  
+  # URL de l'image
+  image: ".//picture/img/@src"
+  
+  # Temps de publication (gère heure, jour, minute)
+  pub_time: ".//span[contains(text(),'heure') or contains(text(),'jour') or contains(text(),'minute')]"
+  
+  # Nombre de lectures
+  views: ".//span[contains(text(),'Lectures')]"
+  
+  # Nombre de commentaires
+  comments: ".//span[contains(text(),'Commentaires')]"
+
+options:
+  base_url: "https://www.ivoirematin.com"
+  time_relative: true                                    # Convertir les temps relatifs en datetime
+  max_items: 20                                          # Nombre max d'articles
+  encoding: "utf-8"                                      # Encodage du site
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
