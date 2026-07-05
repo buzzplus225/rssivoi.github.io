@@ -5,36 +5,36 @@ site:
   rss_description: "Articles scrappés depuis IvoireMatin"
 
 xpath:
-  # Sélecteur pour les conteneurs d'articles (3 structures possibles)
+  # Sélecteur pour les conteneurs d'articles (Parfait, préservé)
   post_container: |
     //div[contains(@class,'post-main') and contains(@class,'post-large') and .//span[contains(text(),'Lectures')]] | 
     //li[contains(@class,'post-content-vertical') and contains(@class,'post-large') and .//span[contains(text(),'Lectures')]] | 
     //div[contains(@class,'post-sidebar-big') and contains(@class,'post-global') and .//span[contains(text(),'Lectures')]]
   
-  # Titre de l'article (normalisé)
-  title: "normalize-space(.//a[contains(@class,'content-link')])"
+  # Titre de l'article : ciblage direct du texte de l'ancre
+  title: ".//a[contains(@class,'content-link')]/text()"
   
   # URL de l'article
   url: ".//a[contains(@class,'content-link')]/@href"
   
-  # Description / résumé
-  description: ".//p[contains(@class,'post-large__text')]"
+  # Description / résumé : extraction du texte du paragraphe
+  description: ".//p[contains(@class,'post-large__text')]/text()"
   
-  # URL de l'image
+  # URL de l'image (Vérifiez si l'attribut n'est pas parfois 'data-src' pour le lazy-loading)
   image: ".//picture/img/@src"
   
-  # Temps de publication (gère heure, jour, minute)
-  pub_time: ".//span[contains(text(),'heure') or contains(text(),'jour') or contains(text(),'minute')]"
+  # Temps de publication (extrait le texte directement)
+  pub_time: ".//span[contains(text(),'heure') or contains(text(),'jour') or contains(text(),'minute')]/text()"
   
   # Nombre de lectures
-  views: ".//span[contains(text(),'Lectures')]"
+  views: ".//span[contains(text(),'Lectures')]/text()"
   
   # Nombre de commentaires
-  comments: ".//span[contains(text(),'Commentaires')]"
+  comments: ".//span[contains(text(),'Commentaires')]/text()"
 
 options:
   base_url: "https://www.ivoirematin.com"
-  time_relative: true                                    # Convertir les temps relatifs en datetime
-  max_items: 20                                          # Nombre max d'articles
-  encoding: "utf-8"                                      # Encodage du site
+  time_relative: true
+  max_items: 20
+  encoding: "utf-8"
   user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
