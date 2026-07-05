@@ -14,6 +14,11 @@ jobs:
   scrape-and-deploy:
     runs-on: ubuntu-latest
     
+    # AJOUT DE L'ENVIRONNEMENT ICI
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
     - uses: actions/checkout@v4
     
@@ -45,4 +50,5 @@ jobs:
         path: .
     
     - name: Deploy to GitHub Pages
+      id: deployment # Ajouté pour alimenter l'URL de l'environnement ci-dessus
       uses: actions/deploy-pages@v4
