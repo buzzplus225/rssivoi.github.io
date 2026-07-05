@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   pages: write
+  id-token: write            # 1. REQUIS pour actions/deploy-pages
 
 jobs:
   scrape-and-deploy:
@@ -28,12 +29,13 @@ jobs:
     - name: Run scraper
       run: python scraper.py
       env:
-        RSS_URL: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/feed.xml"
+        # 2. Utilisation de la variable native simplifiée pour le nom du dépôt
+        RSS_URL: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name || github.event.repository.name == '' && github.repository || github.repository }}/feed.xml"
     
     - name: Commit and push feed.xml
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
-        commit_message: "🔄 Mise à jour automatique du flux RSS"
+        commit_message: "🔄 Mise à jour automatique du flux RSS [skip ci]" # 3. Évite la boucle infinie
         file_pattern: feed.xml
         branch: main
     
