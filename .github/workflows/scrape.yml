@@ -21,6 +21,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        # Assure que l'action récupère bien la branche main avec les droits d'écriture
+        ref: main
     
     - name: Setup Python
       uses: actions/setup-python@v5
@@ -34,7 +37,8 @@ jobs:
     - name: Run scraper
       run: python scraper.py
       env:
-        RSS_URL: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name || github.repository }}/feed.xml"
+        # Correction de l'URL pour éviter la duplication du nom d'utilisateur dans le chemin
+        RSS_URL: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/feed.xml"
     
     # ÉTAPE 1 : Sauvegarder le fichier généré dans Git avant de s'occuper de Pages
     - name: Commit and push feed.xml
@@ -44,15 +48,13 @@ jobs:
         file_pattern: feed.xml
         branch: main
 
-    # ÉTAPE 2 : Nettoyer ou cibler uniquement ce qui doit être publié.
-    # Si votre site ne contient QUE le fichier feed.xml à la racine, nous l'envoyons spécifiquement.
-    # Si vous avez d'autres fichiers (index.html, etc.), '.' reste correct, mais l'avoir commité avant stabilise l'artefact.
+    # ÉTAPE 2 : Préparation de l'artefact pour GitHub Pages
     - name: Upload to GitHub Pages
       uses: actions/upload-pages-artifact@v3
       with:
         path: '.' 
     
-    # ÉTAPE 3 : Déploiement avec la version v4 majeure stable (qui intègre tous les correctifs Node récents)
+    # ÉTAPE 3 : Déploiement de l'artefact sur les serveurs de Pages
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
