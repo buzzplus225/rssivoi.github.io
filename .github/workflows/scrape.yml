@@ -19,12 +19,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-    # 1. Passage en v4.2.2 (ou simplement @v4 si le tag a été mis à jour par les auteurs)
-    - uses: actions/checkout@v4.2.2
+    - name: Checkout repository
+      uses: actions/checkout@v4
     
-    # 2. Passage en v5.4.0+ pour le support Node 24
     - name: Setup Python
-      uses: actions/setup-python@v5.4.0
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
     
@@ -35,23 +34,25 @@ jobs:
     - name: Run scraper
       run: python scraper.py
       env:
-        RSS_URL: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name || github.event.repository.name == '' && github.repository || github.repository }}/feed.xml"
+        RSS_URL: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name || github.repository }}/feed.xml"
     
-    # 3. Passage en v5.1.0+ pour le support Node 24
+    # ÉTAPE 1 : Sauvegarder le fichier généré dans Git avant de s'occuper de Pages
     - name: Commit and push feed.xml
-      uses: stefanzweifel/git-auto-commit-action@v5.1.0
+      uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "🔄 Mise à jour automatique du flux RSS [skip ci]"
         file_pattern: feed.xml
         branch: main
-    
-    # 4. upload-pages-artifact utilise upload-artifact en interne. Passage en v3.0.1+
+
+    # ÉTAPE 2 : Nettoyer ou cibler uniquement ce qui doit être publié.
+    # Si votre site ne contient QUE le fichier feed.xml à la racine, nous l'envoyons spécifiquement.
+    # Si vous avez d'autres fichiers (index.html, etc.), '.' reste correct, mais l'avoir commité avant stabilise l'artefact.
     - name: Upload to GitHub Pages
-      uses: actions/upload-pages-artifact@v3.0.1
+      uses: actions/upload-pages-artifact@v3
       with:
-        path: .
+        path: '.' 
     
-    # 5. Passage en v4.0.5+ pour le support officiel de Node 24
+    # ÉTAPE 3 : Déploiement avec la version v4 majeure stable (qui intègre tous les correctifs Node récents)
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v4.0.5
+      uses: actions/deploy-pages@v4
